@@ -3,11 +3,20 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv").config();
 const cors = require("cors");
+const corsConfig = {
+  origin: "*",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  headers: ["Content-Type", "Authorization"],
+  };
+app.options("",cors(corsConfig));
+
 const app = express();
 const PORT = 8080;
-
+const uri =
+  "mongodb+srv://uccranjana13:36Oc0veUGUQ3JLnn@clustermy.pczueyb.mongodb.net/?retryWrites=true&w=majority&appName=loginandsignup";
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsConfig));
 
 //connection
 mongoose
@@ -40,7 +49,7 @@ const userModel = mongoose.model("names", userSchema);
 
 //signup api
 
-app.post("/signup",async (req, res, next) => {
+app.post("/signup", async (req, res, next) => {
   try {
     const { name, password, email } = req.body;
     const exisitingUser = await userModel.findOne({ email: email });
@@ -65,18 +74,17 @@ app.post("/signup",async (req, res, next) => {
 });
 
 //login api
-app.post("/login",  async (req, res,) => {
+app.post("/login", async (req, res) => {
   try {
     const { name, password, email } = req.body;
-    const exisitingUser =  await userModel.findOne({ email: email });
+    const exisitingUser = await userModel.findOne({ email: email });
     if (!exisitingUser) {
       return res.status(404).send("User does not exist");
     }
-      const isPasswordCorrect = await bcrypt.compare(
-        password,
-        exisitingUser.password
-      );
-    
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      exisitingUser.password
+    );
 
     if (isPasswordCorrect) {
       return res.status(200).send("User Logged in successfully");
@@ -91,6 +99,6 @@ app.get("/", (req, res, next) => {
   return res.send("Connected with the server!!");
 });
 
-app.listen(PORT,  (req, res) => {
-  console.log("Hello, I am your server!! at " +PORT);
+app.listen(PORT, (req, res) => {
+  console.log("Hello, I am your server!! at " + PORT);
 });
